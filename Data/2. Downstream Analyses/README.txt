@@ -1,0 +1,1 @@
+The file for the wellbeing data and covariates is not publicly available since it contains sensitive data and identifiers. For data request, see https://ntr-data-request.psy.vu.nl/index.html

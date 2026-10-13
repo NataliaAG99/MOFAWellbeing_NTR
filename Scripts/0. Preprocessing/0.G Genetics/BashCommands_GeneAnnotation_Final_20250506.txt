@@ -1,0 +1,25 @@
+plink --bfile /data2/PUBLIC/Genotypes/MRG18/HRC/MRG18_HRC_HM3subset/MRG18_HM3_SNPS --maf 0.01 --hwe 0.0001 --geno 0.95 --make-bed --out intermediatefile1
+
+awk '{print $1" "$2}' intermediatefile1.fam | grep "5143" > ntronly
+grep -f /data/natalia/Multi-omics/MOFA/fisnumbersMeth_20240916.txt ntronly > ntronlyoverlapping
+
+
+plink --bfile intermediatefile1 --keep ntronlyoverlapping --recode A --out final_variable_snps_complete
+
+head -n 1 final_variable_snps_complete.raw | cut -d' ' -f1-10
+
+head -n 1 final_variable_snps_complete.raw | cut -d' ' -f7- | sed 's/_[ACTG]//g' > SNPsfilteredcomplete.txt
+
+tr ' ' '\n' < SNPsfilteredcomplete.txt > SNPscleaned_list.txt
+
+*************Option A (with Pau annotation and R)
+
+awk 'NR==FNR {order[$1] = FNR; next} $2 in order {print $0}' SNPscleaned_list.txt /data2/PUBLIC/Genotypes/MRG18/HRC/MRG18_HRC_HM3subset/MRG18_HM3_SNPS.bim | sort -k1
+,1n | sed 's/\s\+/,/g' > SNPsFilteredReordered_file.csv
+
+wc -l SNPsFilteredReordered_file.csv
+
+wc -l SNPscleaned_list.txt
+
+***Here it calls an RScript!
+nohup Rscript RScript_GeneAnnotation_Final_20250506.R >logGeneAnnotationReduction2.o 2>logGeneAnnotationReduction2.e &
